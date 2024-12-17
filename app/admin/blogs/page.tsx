@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -11,6 +10,8 @@ import {
 } from "@/components/ui/table";
 import prisma from "@/lib/prisma";
 import BlogActions from "@/components/BlogActions";
+import SearchInput from "@/components/SearchInput";
+import { Prisma } from "@prisma/client";
 
 interface PageProps {
   searchParams: { [key: string]: string | string[] | undefined };
@@ -26,15 +27,16 @@ export default async function BlogsPage({ searchParams }: PageProps) {
       ? searchParams.category
       : undefined;
 
-  const where = {
+  const where: Prisma.BlogWhereInput = {
     ...(search && {
       OR: [
-        { title: { contains: search, mode: "insensitive" } },
-        { content: { contains: search, mode: "insensitive" } },
+        { title: { contains: search, mode: "insensitive" as Prisma.QueryMode } },
+        { content: { contains: search, mode: "insensitive" as Prisma.QueryMode } },
       ],
     }),
     ...(category && { category }),
   };
+
 
   const blogs = await prisma.blog.findMany({
     where,
@@ -47,15 +49,15 @@ export default async function BlogsPage({ searchParams }: PageProps) {
   const totalBlogs = await prisma.blog.count({ where });
   const totalPages = Math.ceil(totalBlogs / limit);
 
-  const categories = await prisma.blog.groupBy({
-    by: ["category"],
-    _count: true,
-    orderBy: {
-      _count: {
-        category: "desc",
-      },
-    },
-  });
+  // const categories = await prisma.blog.groupBy({
+  //   by: ["category"],
+  //   _count: true,
+  //   orderBy: {
+  //     _count: {
+  //       category: "desc",
+  //     },
+  //   },
+  // });
 
   return (
     <div>
@@ -67,17 +69,8 @@ export default async function BlogsPage({ searchParams }: PageProps) {
       </div>
 
       <div className="mb-4 flex gap-4">
-        <Input
-          placeholder="Search blogs..."
-          defaultValue={search}
-          onChange={(e) => {
-            const searchParams = new URLSearchParams(window.location.search);
-            searchParams.set("search", e.target.value);
-            searchParams.set("page", "1");
-            window.location.search = searchParams.toString();
-          }}
-        />
-        <select
+        <SearchInput defaultValue={search} />
+        {/* <select
           className="border rounded p-2"
           defaultValue={category}
           onChange={(e) => {
@@ -93,7 +86,7 @@ export default async function BlogsPage({ searchParams }: PageProps) {
               {cat.category} ({cat._count})
             </option>
           ))}
-        </select>
+        </select> */}
       </div>
 
       <Table>
@@ -116,7 +109,7 @@ export default async function BlogsPage({ searchParams }: PageProps) {
               <TableCell>{blog.category}</TableCell>
               <TableCell>{blog.published ? "Yes" : "No"}</TableCell>
               <TableCell>
-                <BlogActions blog={blog} />
+                <BlogActions blog={{ id: BigInt(blog.id), title: blog?.title }} />
               </TableCell>
             </TableRow>
           ))}

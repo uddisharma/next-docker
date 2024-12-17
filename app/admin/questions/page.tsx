@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -11,6 +10,8 @@ import {
 } from "@/components/ui/table";
 import prisma from "@/lib/prisma";
 import QuestionActions from "@/components/QuestionActions";
+import SearchInput from "@/components/SearchInput";
+import { Prisma } from "@prisma/client";
 
 interface PageProps {
   searchParams: { [key: string]: string | string[] | undefined };
@@ -22,11 +23,15 @@ export default async function QuestionsPage({ searchParams }: PageProps) {
   const search =
     typeof searchParams.search === "string" ? searchParams.search : undefined;
 
-  const where = search
+  const where: Prisma.QuestionWhereInput = search
     ? {
-        text: { contains: search, mode: "insensitive" },
-      }
+      text: {
+        contains: search,
+        mode: "insensitive" as Prisma.QueryMode,
+      },
+    }
     : {};
+
 
   const questions = await prisma.question.findMany({
     where,
@@ -36,7 +41,7 @@ export default async function QuestionsPage({ searchParams }: PageProps) {
     include: { options: true },
   });
 
-  const totalQuestions = await prisma.question.count({ where });
+  const totalQuestions = await prisma.question.count();
   const totalPages = Math.ceil(totalQuestions / limit);
 
   return (
@@ -49,16 +54,7 @@ export default async function QuestionsPage({ searchParams }: PageProps) {
       </div>
 
       <div className="mb-4">
-        <Input
-          placeholder="Search questions..."
-          defaultValue={search}
-          onChange={(e) => {
-            const searchParams = new URLSearchParams(window.location.search);
-            searchParams.set("search", e.target.value);
-            searchParams.set("page", "1");
-            window.location.search = searchParams.toString();
-          }}
-        />
+        <SearchInput defaultValue={search} />
       </div>
 
       <Table>
@@ -67,7 +63,6 @@ export default async function QuestionsPage({ searchParams }: PageProps) {
             <TableHead>Sequence</TableHead>
             <TableHead>Question</TableHead>
             <TableHead>Type</TableHead>
-            <TableHead>Options</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -77,7 +72,6 @@ export default async function QuestionsPage({ searchParams }: PageProps) {
               <TableCell>{question.sequence}</TableCell>
               <TableCell>{question.text}</TableCell>
               <TableCell>{question.questionType}</TableCell>
-              <TableCell>{question.options.length}</TableCell>
               <TableCell>
                 <QuestionActions question={question} />
               </TableCell>

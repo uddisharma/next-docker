@@ -8,7 +8,7 @@ interface PageProps {
 
 export default async function EditUserPage({ params }: PageProps) {
   const user = await prisma.user.findUnique({
-    where: { id: BigInt(params.id) },
+    where: { id: Number(params.id) },
   });
 
   if (!user) {
@@ -18,7 +18,7 @@ export default async function EditUserPage({ params }: PageProps) {
   return (
     <div>
       <h1 className="text-2xl font-semibold mb-6">Edit User</h1>
-      <UserForm user={user} />
+      <UserForm user={{ ...user, id: BigInt(user.id) }} />
     </div>
   );
 }

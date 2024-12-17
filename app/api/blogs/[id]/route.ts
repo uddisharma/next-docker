@@ -18,15 +18,15 @@ export async function DELETE(
   const id = parseInt(params.id);
 
   try {
-    await prisma.question.delete({
+    await prisma.blog.delete({
       where: { id },
     });
 
-    return NextResponse.json({ message: "Question deleted successfully" });
+    return NextResponse.json({ message: "Blog deleted successfully" });
   } catch (error) {
-    console.error("Error deleting question:", error);
+    console.error("Error deleting blog:", error);
     return NextResponse.json(
-      { error: "Failed to delete question" },
+      { error: "Failed to delete blog" },
       { status: 500 },
     );
   }

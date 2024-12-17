@@ -42,7 +42,9 @@ export default async function AdminDashboard() {
             <CardTitle>User Growth</CardTitle>
           </CardHeader>
           <CardContent>
-            <UserChart data={users} />
+            <UserChart data={users?.map((e) => {
+              return { id: BigInt(e.id), createdAt: e.createdAt }
+            })} />
           </CardContent>
         </Card>
         <Card>
@@ -67,7 +69,7 @@ export default async function AdminDashboard() {
             <CardTitle>Report Submissions</CardTitle>
           </CardHeader>
           <CardContent>
-            <ReportChart data={reports} />
+            <ReportChart data={reports.map(report => ({ id: BigInt(report.user.id), createdAt: report.createdAt }))} />
           </CardContent>
         </Card>
         <Card>
@@ -93,7 +95,7 @@ export default async function AdminDashboard() {
             <CardTitle>Blog Publications</CardTitle>
           </CardHeader>
           <CardContent>
-            <BlogChart data={blogs} />
+            <BlogChart data={blogs.map(blog => ({ id: BigInt(blog.id), createdAt: blog.createdAt.toISOString() }))} />
           </CardContent>
         </Card>
         <Card>

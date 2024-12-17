@@ -8,7 +8,7 @@ interface PageProps {
 
 export default async function EditBlogPage({ params }: PageProps) {
   const blog = await prisma.blog.findUnique({
-    where: { id: BigInt(params.id) },
+    where: { id: Number(params.id) },
   });
 
   if (!blog) {
@@ -18,7 +18,7 @@ export default async function EditBlogPage({ params }: PageProps) {
   return (
     <div>
       <h1 className="text-2xl font-semibold mb-6">Edit Blog</h1>
-      <BlogForm blog={blog} />
+      <BlogForm blog={{ ...blog, id: BigInt(blog.id) }} />
     </div>
   );
 }

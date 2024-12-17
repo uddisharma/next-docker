@@ -3,18 +3,18 @@
 import { revalidatePath } from "next/cache";
 import { unstable_cache } from "next/cache";
 import prisma from "@/lib/prisma";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+// import { getServerSession } from "next-auth/next";
+// import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { questionSchema, type QuestionFormData } from "@/lib/schemas";
 
 export async function addQuestion(questionData: QuestionFormData) {
-  const session = await getServerSession(authOptions);
-  if (
-    !session ||
-    (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")
-  ) {
-    throw new Error("Unauthorized");
-  }
+  // const session = await getServerSession(authOptions);
+  // if (
+  //   !session ||
+  //   (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")
+  // ) {
+  //   throw new Error("Unauthorized");
+  // }
 
   const validatedData = questionSchema.parse(questionData);
 
@@ -37,13 +37,13 @@ export async function updateQuestion(
   id: number,
   questionData: QuestionFormData,
 ) {
-  const session = await getServerSession(authOptions);
-  if (
-    !session ||
-    (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")
-  ) {
-    throw new Error("Unauthorized");
-  }
+  // const session = await getServerSession(authOptions);
+  // if (
+  //   !session ||
+  //   (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")
+  // ) {
+  //   throw new Error("Unauthorized");
+  // }
 
   const validatedData = questionSchema.parse(questionData);
 

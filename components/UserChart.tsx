@@ -1,3 +1,4 @@
+// components/UserChart.tsx
 "use client";
 
 import { Line, LineChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
@@ -10,12 +11,16 @@ import {
 interface UserChartProps {
   data: Array<{
     id: bigint;
-    createdAt: Date;
+    createdAt: string; // Assuming createdAt is a string
   }>;
 }
 
 export function UserChart({ data }: UserChartProps) {
   const chartData = data
+    .map((user) => ({
+      ...user,
+      createdAt: new Date(user.createdAt),
+    }))
     .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
     .reduce(
       (acc, user) => {
@@ -49,7 +54,7 @@ export function UserChart({ data }: UserChartProps) {
           <Line
             type="monotone"
             dataKey="users"
-            stroke="var(--color-users)"
+            stroke="hsl(var(--chart-1))"
             strokeWidth={2}
           />
         </LineChart>

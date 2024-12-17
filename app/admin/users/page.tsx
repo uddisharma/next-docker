@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -11,6 +10,8 @@ import {
 } from "@/components/ui/table";
 import prisma from "@/lib/prisma";
 import UserActions from "@/components/UserActions";
+import { Prisma } from "@prisma/client";
+import SearchInput from "@/components/SearchInput";
 
 interface PageProps {
   searchParams: { [key: string]: string | string[] | undefined };
@@ -22,14 +23,14 @@ export default async function UsersPage({ searchParams }: PageProps) {
   const search =
     typeof searchParams.search === "string" ? searchParams.search : undefined;
 
-  const where = search
+  const where: Prisma.UserWhereInput = search
     ? {
-        OR: [
-          { firstName: { contains: search, mode: "insensitive" } },
-          { lastName: { contains: search, mode: "insensitive" } },
-          { email: { contains: search, mode: "insensitive" } },
-        ],
-      }
+      OR: [
+        { firstName: { contains: search, mode: "insensitive" as Prisma.QueryMode } },
+        { lastName: { contains: search, mode: "insensitive" as Prisma.QueryMode } },
+        { email: { contains: search, mode: "insensitive" as Prisma.QueryMode } },
+      ],
+    }
     : {};
 
   const users = await prisma.user.findMany({
@@ -52,16 +53,7 @@ export default async function UsersPage({ searchParams }: PageProps) {
       </div>
 
       <div className="mb-4">
-        <Input
-          placeholder="Search users..."
-          defaultValue={search}
-          onChange={(e) => {
-            const searchParams = new URLSearchParams(window.location.search);
-            searchParams.set("search", e.target.value);
-            searchParams.set("page", "1");
-            window.location.search = searchParams.toString();
-          }}
-        />
+        <SearchInput />
       </div>
 
       <Table>
@@ -82,7 +74,10 @@ export default async function UsersPage({ searchParams }: PageProps) {
               <TableCell>{user.email}</TableCell>
               <TableCell>{user.role}</TableCell>
               <TableCell>
-                <UserActions user={user} />
+                <UserActions user={{
+                  id: BigInt(user.id),
+                  email: user.email
+                }} />
               </TableCell>
             </TableRow>
           ))}

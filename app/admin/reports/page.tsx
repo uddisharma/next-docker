@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -11,6 +10,8 @@ import {
 } from "@/components/ui/table";
 import prisma from "@/lib/prisma";
 import ReportActions from "@/components/ReportActions";
+import { Prisma } from "@prisma/client";
+import SearchInput from "@/components/SearchInput";
 
 interface PageProps {
   searchParams: { [key: string]: string | string[] | undefined };
@@ -22,15 +23,16 @@ export default async function ReportsPage({ searchParams }: PageProps) {
   const search =
     typeof searchParams.search === "string" ? searchParams.search : undefined;
 
-  const where = search
+  const where: Prisma.ReportWhereInput = search
     ? {
-        OR: [
-          { user: { firstName: { contains: search, mode: "insensitive" } } },
-          { user: { lastName: { contains: search, mode: "insensitive" } } },
-          { user: { email: { contains: search, mode: "insensitive" } } },
-        ],
-      }
+      OR: [
+        { user: { firstName: { contains: search, mode: "insensitive" as Prisma.QueryMode } } },
+        { user: { lastName: { contains: search, mode: "insensitive" as Prisma.QueryMode } } },
+        { user: { email: { contains: search, mode: "insensitive" as Prisma.QueryMode } } },
+      ],
+    }
     : {};
+
 
   const reports = await prisma.report.findMany({
     where,
@@ -50,16 +52,7 @@ export default async function ReportsPage({ searchParams }: PageProps) {
       </div>
 
       <div className="mb-4">
-        <Input
-          placeholder="Search reports..."
-          defaultValue={search}
-          onChange={(e) => {
-            const searchParams = new URLSearchParams(window.location.search);
-            searchParams.set("search", e.target.value);
-            searchParams.set("page", "1");
-            window.location.search = searchParams.toString();
-          }}
-        />
+        <SearchInput />
       </div>
 
       <Table>
@@ -80,7 +73,7 @@ export default async function ReportsPage({ searchParams }: PageProps) {
                 {new Date(report.createdAt).toLocaleString()}
               </TableCell>
               <TableCell>
-                <ReportActions report={report} />
+                <ReportActions report={{ id: BigInt(report.id) }} />
               </TableCell>
             </TableRow>
           ))}

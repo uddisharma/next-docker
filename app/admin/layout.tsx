@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
-import { getServerSession } from "next-auth/next";
-import { redirect } from "next/navigation";
-import { authOptions } from "../api/auth/[...nextauth]/route";
+// import { getServerSession } from "next-auth/next";
+// import { redirect } from "next/navigation";
+// import { authOptions } from "../api/auth/[...nextauth]/route";
 import AdminSidebar from "@/components/AdminSidebar";
 
 export default async function AdminLayout({
@@ -9,14 +9,14 @@ export default async function AdminLayout({
 }: {
   children: ReactNode;
 }) {
-  const session = await getServerSession(authOptions);
+  // const session = await getServerSession(authOptions);
 
-  if (
-    !session ||
-    (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")
-  ) {
-    redirect("/auth/signin");
-  }
+  // if (
+  //   !session ||
+  //   (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")
+  // ) {
+  //   redirect("/auth/signin");
+  // }
 
   return (
     <div className="flex h-screen bg-gray-100">

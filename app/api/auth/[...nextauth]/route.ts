@@ -1,4 +1,8 @@
-import NextAuth, { DefaultSession, DefaultUser, NextAuthOptions } from "next-auth";
+import NextAuth, {
+  DefaultSession,
+  DefaultUser,
+  NextAuthOptions,
+} from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
@@ -79,7 +83,7 @@ const authOptions: NextAuthOptions = {
     }),
   ],
   pages: {
-    signIn: '/auth/signin',
+    signIn: "/auth/signin",
   },
   session: {
     strategy: "jwt",
@@ -100,7 +104,7 @@ const authOptions: NextAuthOptions = {
       return session;
     },
   },
-}
+};
 
 const handler = NextAuth(authOptions);
 
