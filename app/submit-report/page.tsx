@@ -1,15 +1,15 @@
-import { getServerSession } from "next-auth/next";
-import { redirect } from "next/navigation";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+// import { getServerSession } from "next-auth/next";
+// import { redirect } from "next/navigation";
+// import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import ReportForm from "@/components/ReportForm";
 import prisma from "@/lib/prisma";
 
 export default async function SubmitReportPage() {
-  const session = await getServerSession(authOptions);
+  // const session = await getServerSession(authOptions);
 
-  if (!session) {
-    redirect("/auth/signin");
-  }
+  // if (!session) {
+  //   redirect("/auth/signin");
+  // }
 
   const activeQuestions = await prisma.question.findMany({
     where: { isActive: true },
@@ -22,7 +22,7 @@ export default async function SubmitReportPage() {
       <h1 className="text-2xl font-bold mb-4">Submit Report</h1>
       <ReportForm
         questions={activeQuestions}
-        userId={BigInt(session.user.id)}
+        userId={3}
       />
     </div>
   );

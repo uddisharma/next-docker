@@ -25,14 +25,34 @@ export default async function ReportsPage({ searchParams }: PageProps) {
 
   const where: Prisma.ReportWhereInput = search
     ? {
-      OR: [
-        { user: { firstName: { contains: search, mode: "insensitive" as Prisma.QueryMode } } },
-        { user: { lastName: { contains: search, mode: "insensitive" as Prisma.QueryMode } } },
-        { user: { email: { contains: search, mode: "insensitive" as Prisma.QueryMode } } },
-      ],
-    }
+        OR: [
+          {
+            user: {
+              firstName: {
+                contains: search,
+                mode: "insensitive" as Prisma.QueryMode,
+              },
+            },
+          },
+          {
+            user: {
+              lastName: {
+                contains: search,
+                mode: "insensitive" as Prisma.QueryMode,
+              },
+            },
+          },
+          {
+            user: {
+              email: {
+                contains: search,
+                mode: "insensitive" as Prisma.QueryMode,
+              },
+            },
+          },
+        ],
+      }
     : {};
-
 
   const reports = await prisma.report.findMany({
     where,

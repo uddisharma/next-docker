@@ -10,7 +10,7 @@ import {
 interface BlogChartProps {
   data: Array<{
     id: bigint;
-    createdAt: string; // Assuming createdAt is a string
+    createdAt: Date; // Assuming createdAt is a string
   }>;
 }
 

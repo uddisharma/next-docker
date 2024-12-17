@@ -25,13 +25,12 @@ export default async function QuestionsPage({ searchParams }: PageProps) {
 
   const where: Prisma.QuestionWhereInput = search
     ? {
-      text: {
-        contains: search,
-        mode: "insensitive" as Prisma.QueryMode,
-      },
-    }
+        text: {
+          contains: search,
+          mode: "insensitive" as Prisma.QueryMode,
+        },
+      }
     : {};
-
 
   const questions = await prisma.question.findMany({
     where,

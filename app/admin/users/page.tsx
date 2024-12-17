@@ -25,12 +25,27 @@ export default async function UsersPage({ searchParams }: PageProps) {
 
   const where: Prisma.UserWhereInput = search
     ? {
-      OR: [
-        { firstName: { contains: search, mode: "insensitive" as Prisma.QueryMode } },
-        { lastName: { contains: search, mode: "insensitive" as Prisma.QueryMode } },
-        { email: { contains: search, mode: "insensitive" as Prisma.QueryMode } },
-      ],
-    }
+        OR: [
+          {
+            firstName: {
+              contains: search,
+              mode: "insensitive" as Prisma.QueryMode,
+            },
+          },
+          {
+            lastName: {
+              contains: search,
+              mode: "insensitive" as Prisma.QueryMode,
+            },
+          },
+          {
+            email: {
+              contains: search,
+              mode: "insensitive" as Prisma.QueryMode,
+            },
+          },
+        ],
+      }
     : {};
 
   const users = await prisma.user.findMany({
@@ -74,10 +89,12 @@ export default async function UsersPage({ searchParams }: PageProps) {
               <TableCell>{user.email}</TableCell>
               <TableCell>{user.role}</TableCell>
               <TableCell>
-                <UserActions user={{
-                  id: BigInt(user.id),
-                  email: user.email
-                }} />
+                <UserActions
+                  user={{
+                    id: BigInt(user.id),
+                    email: user.email,
+                  }}
+                />
               </TableCell>
             </TableRow>
           ))}

@@ -19,7 +19,7 @@ interface PageProps {
 
 export default async function BlogsPage({ searchParams }: PageProps) {
   const page = Number(searchParams.page) || 1;
-  const limit = 10;
+  const limit = 1;
   const search =
     typeof searchParams.search === "string" ? searchParams.search : undefined;
   const category =
@@ -30,13 +30,19 @@ export default async function BlogsPage({ searchParams }: PageProps) {
   const where: Prisma.BlogWhereInput = {
     ...(search && {
       OR: [
-        { title: { contains: search, mode: "insensitive" as Prisma.QueryMode } },
-        { content: { contains: search, mode: "insensitive" as Prisma.QueryMode } },
+        {
+          title: { contains: search, mode: "insensitive" as Prisma.QueryMode },
+        },
+        {
+          content: {
+            contains: search,
+            mode: "insensitive" as Prisma.QueryMode,
+          },
+        },
       ],
     }),
     ...(category && { category }),
   };
-
 
   const blogs = await prisma.blog.findMany({
     where,
@@ -109,7 +115,9 @@ export default async function BlogsPage({ searchParams }: PageProps) {
               <TableCell>{blog.category}</TableCell>
               <TableCell>{blog.published ? "Yes" : "No"}</TableCell>
               <TableCell>
-                <BlogActions blog={{ id: BigInt(blog.id), title: blog?.title }} />
+                <BlogActions
+                  blog={{ id: BigInt(blog.id), title: blog?.title }}
+                />
               </TableCell>
             </TableRow>
           ))}
