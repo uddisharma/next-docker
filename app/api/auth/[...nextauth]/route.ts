@@ -1,13 +1,9 @@
-import NextAuth, {
-  NextAuthOptions,
-  DefaultSession,
-  DefaultUser,
-} from "next-auth";
+import NextAuth, { DefaultSession, DefaultUser, NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import prisma from "@/lib/prisma";
 import { verifyOTP } from "@/lib/auth";
-import { Prisma, User } from "@prisma/client";
 
 declare module "next-auth" {
   interface Session extends DefaultSession {
@@ -30,7 +26,8 @@ declare module "next-auth/jwt" {
   }
 }
 
-export const authOptions: NextAuthOptions = {
+const authOptions: NextAuthOptions = {
+  adapter: PrismaAdapter(prisma),
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -49,12 +46,12 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Phone and OTP are required");
         }
 
-        const user = (await prisma.user.findUnique({
+        const user = await prisma.user.findUnique({
           where: { phone: credentials.phone },
-        })) as User | null;
+        });
 
         if (!user && !credentials.isSignup) {
-          return null;
+          return null; // User not found and not signing up
         }
 
         const isValid = await verifyOTP(
@@ -81,44 +78,13 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   ],
+  pages: {
+    signIn: '/auth/signin',
+  },
+  session: {
+    strategy: "jwt",
+  },
   callbacks: {
-    async signIn({ account, profile }) {
-      if (account && account.provider === "google") {
-        if (!profile) {
-          throw new Error("Profile is undefined");
-        }
-        const existingUser = await prisma.user.findUnique({
-          where: { email: profile.email },
-        });
-
-        if (!existingUser) {
-          await prisma.user.create({
-            data: {
-              email: profile.email ?? "",
-              firstName: profile.name,
-              image: profile.image || "",
-              role: "USER",
-              accounts: {
-                create: {
-                  ...({
-                    provider: account.provider,
-                    providerAccountId: account.providerAccountId,
-                    refreshToken: account.refreshToken,
-                    accessToken: account.accessToken,
-                    expiresAt: (60 * 60 * 1000) as number | null | undefined, // 1 hour
-                    tokenType: account.tokenType,
-                    scope: account.scope,
-                    idToken: account.idToken,
-                    sessionState: account.sessionState,
-                  } as Prisma.AccountCreateWithoutUserInput),
-                },
-              },
-            },
-          });
-        }
-      }
-      return true;
-    },
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
@@ -134,10 +100,7 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
   },
-  pages: {
-    signIn: "/auth/signin",
-  },
-};
+}
 
 const handler = NextAuth(authOptions);
 
